@@ -1,0 +1,18 @@
+.button {
+    -fx-background-color: #88B703;
+    -fx-font-size: 17pt;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 15;
+}
+
+.label {
+    -fx-text-fill: #FFFFFF;
+}
+
+#gamePart {
+    -fx-padding: 0;
+}
+
+#controlPart{
+    -fx-background-color: #41413E;
+}

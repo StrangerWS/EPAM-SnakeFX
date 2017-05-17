@@ -1,4 +1,4 @@
-package main.java.com.ssu.artemiy_dobrynin.snake;
+package com.ssu.artemiy_dobrynin.snake;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

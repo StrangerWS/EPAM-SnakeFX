@@ -1,8 +1,8 @@
-package main.java.com.ssu.artemiy_dobrynin.snake.controller;
+package com.ssu.artemiy_dobrynin.snake.controller;
 
-import main.java.com.ssu.artemiy_dobrynin.snake.model.frog.Frog;
-import main.java.com.ssu.artemiy_dobrynin.snake.model.frog.Type;
-import main.java.com.ssu.artemiy_dobrynin.snake.model.snake.Snake;
+import com.ssu.artemiy_dobrynin.snake.model.frog.Frog;
+import com.ssu.artemiy_dobrynin.snake.model.frog.Type;
+import com.ssu.artemiy_dobrynin.snake.model.snake.Snake;
 
 import java.util.Random;
 

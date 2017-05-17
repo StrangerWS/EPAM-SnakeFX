@@ -1,7 +1,7 @@
-package main.java.com.ssu.artemiy_dobrynin.snake.model.frog;
+package com.ssu.artemiy_dobrynin.snake.model.frog;
 
 
-import main.java.com.ssu.artemiy_dobrynin.snake.model.Entity;
+import com.ssu.artemiy_dobrynin.snake.model.Entity;
 import javafx.util.Pair;
 
 /**

@@ -1,6 +1,6 @@
-package main.java.com.ssu.artemiy_dobrynin.snake.model.snake;
+package com.ssu.artemiy_dobrynin.snake.model.snake;
 
-import main.java.com.ssu.artemiy_dobrynin.snake.model.Entity;
+import com.ssu.artemiy_dobrynin.snake.model.Entity;
 import javafx.util.Pair;
 
 import java.util.ArrayList;

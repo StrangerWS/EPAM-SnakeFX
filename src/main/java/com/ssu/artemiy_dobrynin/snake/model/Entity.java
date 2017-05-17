@@ -1,4 +1,4 @@
-package main.java.com.ssu.artemiy_dobrynin.snake.model;
+package com.ssu.artemiy_dobrynin.snake.model;
 
 /**
  * Created by User on 03.03.2017.

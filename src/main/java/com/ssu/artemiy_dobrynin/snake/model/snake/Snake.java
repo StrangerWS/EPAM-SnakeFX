@@ -10,15 +10,48 @@ import java.util.List;
  * Created by DobryninAM on 17.02.2017.
  */
 public class Snake extends Entity {
-    public int direction = 3;
-    public int length = 3;
-    public List<Pair<Integer, Integer>> snakeArray = new ArrayList<>();
+    private int worldWidth;
+    private int worldHeight;
+    private int direction;
+    private int length;
+    private List<Pair<Integer, Integer>> snakeArray = new ArrayList<>();
 
-    public Snake() {
+    public int getDirection() {
+        return direction;
+    }
 
+    public void setDirection(int direction) {
+        this.direction = direction;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public List<Pair<Integer, Integer>> getSnakeArray() {
+        return snakeArray;
+    }
+
+    public void setSnakeArray(List<Pair<Integer, Integer>> snakeArray) {
+        this.snakeArray = snakeArray;
+    }
+
+    public Snake(int worldWidth, int worldHeight) {
+        snakeArray.add(new Pair<>(2, 0));
+        snakeArray.add(new Pair<>(1, 0));
+        snakeArray.add(new Pair<>(0, 0));
+        direction = 0;
+        length = snakeArray.size();
+
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
     }
 
     public void move() {
+        // перемещение самого тела
+        for (int i = snakeArray.size() - 1; i > 0; --i) {
+            snakeArray.set(i, new Pair<>(snakeArray.get(i - 1).getKey(), snakeArray.get(i - 1).getValue()));
+        }
 
         // перемещение по осям
         if (direction == 0) {
@@ -30,25 +63,47 @@ public class Snake extends Entity {
         } else if (direction == 3) {
             snakeArray.set(0, new Pair<>(snakeArray.get(0).getKey(), snakeArray.get(0).getValue() - 1));
         }
-        // перемещение самого тела
-        for (int i = length; i > 0; i--) {
-            snakeArray.set(i, new Pair<>(snakeArray.get(i - 1).getKey(), snakeArray.get(i - 1).getValue()));
+
+
+        // warp
+        if (snakeArray.get(0).getKey() < 0) {
+            snakeArray.set(0, new Pair<>(worldWidth, snakeArray.get(0).getValue()));
+            System.out.println("left -> right");
         }
+        if (snakeArray.get(0).getKey() > worldWidth) {
+            snakeArray.set(0, new Pair<>(0, snakeArray.get(0).getValue()));
+            System.out.println("right -> left");
+        }
+        if (snakeArray.get(0).getValue() < 0) {
+            snakeArray.set(0, new Pair<>(snakeArray.get(0).getKey(), worldHeight));
+            System.out.println("up -> down");
+        }
+        if (snakeArray.get(0).getValue() > worldHeight) {
+            snakeArray.set(0, new Pair<>(snakeArray.get(0).getKey(), 0));
+            System.out.println("down -> up");
+        }
+    }
+
+    public void turnLeft() {
+        if (direction == 3) {
+            direction = 0;
+        } else direction++;
+    }
+
+    public void turnRight() {
+        if (direction == 0) {
+            direction = 3;
+        } else direction--;
     }
 
     @Override
     public void run() {
         move();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     // Если голова пересекает тело
     public boolean isBitten() {
-        for (int i = length; i > 0; i--) {
+        for (int i = snakeArray.size() - 1; i > 0; --i) {
             if (snakeArray.get(i) == snakeArray.get(0)) {
                 return true;
             }

@@ -7,7 +7,7 @@ import javafx.util.Pair;
 /**
  * Created by DobryninAM on 17.02.2017.
  */
-public abstract class Frog extends Entity {
+public class Frog extends Entity {
     private int posX;
     private int posY;
     private Type frogType;
@@ -32,5 +32,9 @@ public abstract class Frog extends Entity {
         this.posX = posX;
         this.posY = posY;
         this.frogType = frogType;
+    }
+
+    public void run(){
+        //поведение для убегания от змеи
     }
 }

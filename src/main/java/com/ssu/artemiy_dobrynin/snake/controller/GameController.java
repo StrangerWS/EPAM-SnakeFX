@@ -4,6 +4,8 @@ import com.ssu.artemiy_dobrynin.snake.model.frog.Frog;
 import com.ssu.artemiy_dobrynin.snake.model.frog.Type;
 import com.ssu.artemiy_dobrynin.snake.model.snake.Snake;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -13,7 +15,7 @@ public class GameController {
 
     // Game objects
     private Snake snake;
-    private Frog[] frogs;
+    private List<Frog> frogs;
     private int score;
 
 
@@ -39,11 +41,11 @@ public class GameController {
         this.snake = snake;
     }
 
-    public Frog[] getFrogs() {
+    public List<Frog> getFrogs() {
         return frogs;
     }
 
-    public void setFrogs(Frog blueFrog) {
+    public void setFrogs(List<Frog> frogs) {
         this.frogs = frogs;
     }
 
@@ -53,6 +55,18 @@ public class GameController {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public int getWorldWidth() {
+        return worldWidth;
+    }
+
+    public int getWorldHeight() {
+        return worldHeight;
+    }
+
+    public int getFrogCount() {
+        return frogCount;
     }
 
     public boolean[][] getField() {
@@ -91,18 +105,14 @@ public class GameController {
     public GameController(int worldWidth, int worldHeight, int frogCount, int difficulty) {
         // difficulty: from 1 to 3, where 1 - easy, 3 - hard.
         // it`s easy to modify difficulty by increasing value
-        if (worldHeight >= 8 && worldWidth >= 10 && frogCount >= 5) {
-            this.worldWidth = worldWidth;
-            this.worldHeight = worldHeight;
-            this.frogCount = frogCount;
-        }
-        else {
-            this.worldWidth = 10;
-            this.worldHeight = 8;
-            this.frogCount = 5;
-        }
 
-        this.snake = new Snake();
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
+        this.frogCount = frogCount;
+
+        frogs = new ArrayList<>();
+
+        this.snake = new Snake(worldWidth, worldHeight);
         Thread snakeThread = new Thread(snake);
         snakeThread.setDaemon(true);
         snakeThread.start();
@@ -117,7 +127,7 @@ public class GameController {
         this.gameDelay /= difficulty;
     }
 
-    private void addFrog(Type frogType) {
+    public void addFrog(Type frogType) {
         frogCount--;
 
         //Init field placement
@@ -126,15 +136,17 @@ public class GameController {
                 field[i][j] = false;
             }
 
-        for (int i = 0; i < snake.length; i++) {
-            for (int j = 0; j < snake.length; j++) {
+        for (int i = 0; i < snake.getLength(); i++) {
+            for (int j = 0; j < snake.getLength(); j++) {
                 field[i][j] = true;
             }
         }
 
-        for (int i = 0; i < frogs.length; i++) {
-            for (int j = 0; j < frogs.length; j++) {
-                field[i][j] = true;
+        if (frogs.size() != 0) {
+            for (int i = 0; i < frogs.size(); i++) {
+                for (int j = 0; j < frogs.size(); j++) {
+                    field[i][j] = true;
+                }
             }
         }
 
@@ -153,6 +165,7 @@ public class GameController {
                 }
             }
         }
+        frogs.add( new Frog(frogX, frogY, frogType));
     }
 
     public void update() {
@@ -178,30 +191,30 @@ public class GameController {
                     return;
                 }
 
-                if (snake.snakeArray.get(0) == searchFrog(Type.GREEN).getCoordinates()) {
+                if (snake.getSnakeArray().get(0) == searchFrog(Type.GREEN).getCoordinates()) {
                     score += scoreModifier;
                     snake.eatNormal();
                     frogs = null;
 
-                    if (snake.length == worldHeight * worldWidth) {
+                    if (snake.getLength() == worldHeight * worldWidth) {
                         isGameOver = true;
                         return;
                     } else {
                         addFrog(Type.GREEN);
                     }
 
-                } else if (snake.snakeArray.get(0) == searchFrog(Type.RED).getCoordinates()) {
+                } else if (searchFrog(Type.RED) != null && snake.getSnakeArray().get(0) == searchFrog(Type.RED).getCoordinates()) {
                     score += scoreModifier * 2;
                     snake.eatBonus();
                     frogs = null;
 
-                    if (snake.length <= 3) {
+                    if (snake.getLength() <= 3) {
                         isGameOver = true;
                         return;
                     } else {
                         addFrog(Type.RED);
                     }
-                } else if (snake.snakeArray.get(0) == searchFrog(Type.BLUE).getCoordinates()) {
+                } else if (searchFrog(Type.BLUE) != null && snake.getSnakeArray().get(0) == searchFrog(Type.BLUE).getCoordinates()) {
                     isGameOver = true;
                     return;
                 }
@@ -212,9 +225,9 @@ public class GameController {
     }
 
     private Frog searchFrog(Type type) {
-        for (int i = 0; i < frogs.length; i++) {
-            if (frogs[i].getFrogType() == type)
-                return frogs[i];
+        for (int i = 0; i < frogs.size(); i++) {
+            if (frogs.get(i).getFrogType() == type)
+                return frogs.get(i);
         }
         return null;
     }

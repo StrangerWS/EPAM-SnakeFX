@@ -22,7 +22,7 @@ public class Main extends Application {
 
         primaryStage.setTitle("Snake by StrangerWS");
         primaryStage.setScene(scene);
-        primaryStage.resizableProperty().set(false);
+        primaryStage.resizableProperty().set(true);
         primaryStage.show();
     }
 }

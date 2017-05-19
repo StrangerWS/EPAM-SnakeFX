@@ -5,14 +5,16 @@ import com.ssu.artemiy_dobrynin.snake.model.frog.Type;
 import com.ssu.artemiy_dobrynin.snake.model.snake.Snake;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.util.Pair;
 
 
@@ -71,6 +73,11 @@ public class ViewController {
     @FXML
     private Button startButton;
 
+    @FXML
+    private DialogPane gameOverDialog;
+    @FXML
+    private Button gameOverButton;
+
 
     public void initialize() {
         initializeStartScreen();
@@ -108,6 +115,7 @@ public class ViewController {
         diffChooser.setVisible(false);
         applyButton.setVisible(false);
         optionsButton.setDisable(false);
+        gameOverDialog.setVisible(false);
     }
 
     public void initializeOptions() {
@@ -159,8 +167,9 @@ public class ViewController {
         //stopping the game
         else {
             game.setGameOver(true);
+            gameOverDialog.setVisible(true);
+            gameOverButton.setText(game.getGameOverMessage());
             timer.stop();
-            initializeStartScreen();
             startButton.setText(START);
             pauseButton.setDisable(true);
             pauseButton.setText(PAUSE);
@@ -172,6 +181,7 @@ public class ViewController {
         gc = canvas.getGraphicsContext2D();
         gamePane.getChildren().add(canvas);
 
+        gamePane.getScene().setOnKeyPressed(event1 -> keyPressed(event1.getCode()));
         canvas.setOnMouseClicked(event -> mouseClicked(event.getButton().toString()));
 
         timer = new AnimationTimer() {
@@ -180,15 +190,16 @@ public class ViewController {
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, currentWidth * CELL_SIZE, currentHeight * CELL_SIZE);
                 renderSnake();
-                for (int i = 0; i < game.getFrogs().size(); i++) {
-                    renderFrog(game.getFrogs().get(i));
-                }
+                if (game.getGreenFrog() != null) renderFrog(game.getGreenFrog());
+                if (game.getBlueFrog() != null) renderFrog(game.getBlueFrog());
+                if (game.getRedFrog() != null) renderFrog(game.getRedFrog());
 
                 updateScoreLabel();
                 game.update();
 
                 if (game.isGameOver()) {
                     timer.stop();
+
                     initializeStartScreen();
                     startButton.setText(START);
                     pauseButton.setText(PAUSE);
@@ -227,7 +238,7 @@ public class ViewController {
     }
 
     public void renderSnake() {
-        for (Pair<Integer, Integer> coords: snake.getSnakeArray()) {
+        for (Pair<Integer, Integer> coords : snake.getSnakeArray()) {
             gc.setFill(Color.YELLOW);
             gc.fillOval(coords.getKey() * CELL_SIZE, coords.getValue() * CELL_SIZE, CELL_SIZE, CELL_SIZE);
             System.out.println(coords.getKey() + " " + coords.getValue());
@@ -258,5 +269,22 @@ public class ViewController {
             snake.turnRight();
             System.out.println("right");
         }
+    }
+
+    public void keyPressed(KeyCode button) {
+        System.out.println(button);
+        if (button == KeyCode.LEFT) {
+            snake.turnLeft();
+            System.out.println("left");
+        }
+        if (button == KeyCode.RIGHT) {
+            snake.turnRight();
+            System.out.println("right");
+        }
+    }
+
+    @FXML
+    public void gameOverButtonPressed(){
+        initializeStartScreen();
     }
 }

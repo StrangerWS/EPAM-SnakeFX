@@ -4,8 +4,6 @@ import com.ssu.artemiy_dobrynin.snake.model.frog.Frog;
 import com.ssu.artemiy_dobrynin.snake.model.frog.Type;
 import com.ssu.artemiy_dobrynin.snake.model.snake.Snake;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -15,8 +13,11 @@ public class GameController {
 
     // Game objects
     private Snake snake;
-    private List<Frog> frogs;
+    private Frog greenFrog;
+    private Frog blueFrog;
+    private Frog redFrog;
     private int score;
+    private String gameOverMessage;
 
 
     // World properties
@@ -33,6 +34,11 @@ public class GameController {
     private int gameDelay = 500;
 
     //Getters & Setters
+
+    public String getGameOverMessage() {
+        return gameOverMessage;
+    }
+
     public Snake getSnake() {
         return snake;
     }
@@ -41,12 +47,28 @@ public class GameController {
         this.snake = snake;
     }
 
-    public List<Frog> getFrogs() {
-        return frogs;
+    public Frog getGreenFrog() {
+        return greenFrog;
     }
 
-    public void setFrogs(List<Frog> frogs) {
-        this.frogs = frogs;
+    public void setGreenFrog(Frog greenFrog) {
+        this.greenFrog = greenFrog;
+    }
+
+    public Frog getBlueFrog() {
+        return blueFrog;
+    }
+
+    public void setBlueFrog(Frog blueFrog) {
+        this.blueFrog = blueFrog;
+    }
+
+    public Frog getRedFrog() {
+        return redFrog;
+    }
+
+    public void setRedFrog(Frog redFrog) {
+        this.redFrog = redFrog;
     }
 
     public int getScore() {
@@ -110,8 +132,6 @@ public class GameController {
         this.worldHeight = worldHeight;
         this.frogCount = frogCount;
 
-        frogs = new ArrayList<>();
-
         this.snake = new Snake(worldWidth, worldHeight);
         Thread snakeThread = new Thread(snake);
         snakeThread.setDaemon(true);
@@ -142,12 +162,15 @@ public class GameController {
             }
         }
 
-        if (frogs.size() != 0) {
-            for (int i = 0; i < frogs.size(); i++) {
-                for (int j = 0; j < frogs.size(); j++) {
-                    field[i][j] = true;
-                }
-            }
+        if (greenFrog != null) {
+            field[greenFrog.getPosX()][greenFrog.getPosY()] = true;
+        }
+
+        if (redFrog != null) {
+            field[redFrog.getPosX()][redFrog.getPosY()] = true;
+        }
+        if (blueFrog != null) {
+            field[blueFrog.getPosX()][blueFrog.getPosY()] = true;
         }
 
         int frogX = random.nextInt(worldWidth);
@@ -165,7 +188,19 @@ public class GameController {
                 }
             }
         }
-        frogs.add( new Frog(frogX, frogY, frogType));
+
+        switch (frogType) {
+            case RED:
+                redFrog = new Frog(frogX, frogY, frogType);
+                break;
+            case GREEN:
+                greenFrog = new Frog(frogX, frogY, frogType);
+                break;
+            case BLUE:
+                blueFrog = new Frog(frogX, frogY, frogType);
+                break;
+        }
+
     }
 
     public void update() {
@@ -174,13 +209,13 @@ public class GameController {
         }
         if (isPlaying) {
             try {
-                if (searchFrog(Type.BLUE) == null && random.nextInt(100) < 15) {
+                if (blueFrog == null && random.nextInt(100) < 15) {
                     addFrog(Type.BLUE);
                 }
-                if (searchFrog(Type.RED) == null && random.nextInt(100) < 35) {
+                if (redFrog == null && random.nextInt(100) < 35) {
                     addFrog(Type.RED);
                 }
-                if (searchFrog(Type.GREEN) == null) {
+                if (greenFrog == null) {
                     addFrog(Type.GREEN);
                 }
 
@@ -188,47 +223,45 @@ public class GameController {
                 Thread.sleep(gameDelay);
                 if (snake.isBitten()) {
                     isGameOver = true;
+                    gameOverMessage = "You Bit Yourself";
                     return;
                 }
 
-                if (snake.getSnakeArray().get(0) == searchFrog(Type.GREEN).getCoordinates()) {
+                if (greenFrog != null && snake.getSnakeArray().get(0).equals(greenFrog.getCoordinates())) {
                     score += scoreModifier;
                     snake.eatNormal();
-                    frogs = null;
+                    greenFrog = null;
 
                     if (snake.getLength() == worldHeight * worldWidth) {
                         isGameOver = true;
+                        gameOverMessage = "YOU WIN!";
                         return;
                     } else {
                         addFrog(Type.GREEN);
                     }
 
-                } else if (searchFrog(Type.RED) != null && snake.getSnakeArray().get(0) == searchFrog(Type.RED).getCoordinates()) {
+                }
+                if (redFrog != null && snake.getSnakeArray().get(0).equals(redFrog.getCoordinates())) {
                     score += scoreModifier * 2;
                     snake.eatBonus();
-                    frogs = null;
+                    redFrog = null;
 
-                    if (snake.getLength() <= 3) {
+                    if (snake.getLength() < 3) {
                         isGameOver = true;
+                        gameOverMessage = "Your Length Is Minimal";
                         return;
                     } else {
                         addFrog(Type.RED);
                     }
-                } else if (searchFrog(Type.BLUE) != null && snake.getSnakeArray().get(0) == searchFrog(Type.BLUE).getCoordinates()) {
+                }
+                if (blueFrog != null && snake.getSnakeArray().get(0).equals(blueFrog.getCoordinates())) {
                     isGameOver = true;
+                    gameOverMessage = "Poisonous Frog Eaten";
                     return;
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    private Frog searchFrog(Type type) {
-        for (int i = 0; i < frogs.size(); i++) {
-            if (frogs.get(i).getFrogType() == type)
-                return frogs.get(i);
-        }
-        return null;
     }
 }

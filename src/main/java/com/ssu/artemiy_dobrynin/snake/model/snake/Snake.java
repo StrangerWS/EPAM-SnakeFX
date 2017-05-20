@@ -68,19 +68,15 @@ public class Snake extends Entity {
         // warp
         if (snakeArray.get(0).getKey() < 0) {
             snakeArray.set(0, new Pair<>(worldWidth - 1, snakeArray.get(0).getValue()));
-            System.out.println("left -> right");
         }
         if (snakeArray.get(0).getKey() > worldWidth - 1) {
             snakeArray.set(0, new Pair<>(0, snakeArray.get(0).getValue()));
-            System.out.println("right -> left");
         }
         if (snakeArray.get(0).getValue() < 0) {
             snakeArray.set(0, new Pair<>(snakeArray.get(0).getKey(), worldHeight - 1));
-            System.out.println("up -> down");
         }
         if (snakeArray.get(0).getValue() > worldHeight- 1) {
             snakeArray.set(0, new Pair<>(snakeArray.get(0).getKey(), 0));
-            System.out.println("down -> up");
         }
     }
 

@@ -5,16 +5,16 @@ import com.ssu.artemiy_dobrynin.snake.model.frog.Type;
 import com.ssu.artemiy_dobrynin.snake.model.snake.Snake;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Window;
 import javafx.util.Pair;
 
 
@@ -73,12 +73,6 @@ public class ViewController {
     @FXML
     private Button startButton;
 
-    @FXML
-    private DialogPane gameOverDialog;
-    @FXML
-    private Button gameOverButton;
-
-
     public void initialize() {
         initializeStartScreen();
         pauseButton.setDisable(true);
@@ -86,10 +80,10 @@ public class ViewController {
         diffChooser.getItems().addAll("Easy", "Medium", "Hard");
         diffChooser.setValue("Medium");
 
-        for (int i = 16; i <= 48; i++) {
+        for (int i = 16; i <= 24; i++) {
             gfhChooser.getItems().add(i);
         }
-        for (int i = 16; i <= 48; i++) {
+        for (int i = 21; i <= 32; i++) {
             gfwChooser.getItems().add(i);
         }
         for (int i = 5; i <= 100; i++) {
@@ -97,7 +91,7 @@ public class ViewController {
         }
 
         gfhChooser.setValue(16);
-        gfwChooser.setValue(16);
+        gfwChooser.setValue(21);
         fcChooser.setValue(9);
 
         initializeStartScreen();
@@ -115,9 +109,9 @@ public class ViewController {
         diffChooser.setVisible(false);
         applyButton.setVisible(false);
         optionsButton.setDisable(false);
-        gameOverDialog.setVisible(false);
     }
 
+    @FXML
     public void initializeOptions() {
         scoreLabel.setVisible(false);
         gfwLabel.setVisible(true);
@@ -150,7 +144,7 @@ public class ViewController {
     }
 
     @FXML
-    protected void startButtonClicked() {
+    protected void startButtonPressed() {
 
         if (startButton.getText().equals(START)) {
             initializeGame();
@@ -167,9 +161,8 @@ public class ViewController {
         //stopping the game
         else {
             game.setGameOver(true);
-            gameOverDialog.setVisible(true);
-            gameOverButton.setText(game.getGameOverMessage());
             timer.stop();
+            initializeStartScreen();
             startButton.setText(START);
             pauseButton.setDisable(true);
             pauseButton.setText(PAUSE);
@@ -199,7 +192,7 @@ public class ViewController {
 
                 if (game.isGameOver()) {
                     timer.stop();
-
+                    showDialogGameOver();
                     initializeStartScreen();
                     startButton.setText(START);
                     pauseButton.setText(PAUSE);
@@ -229,6 +222,10 @@ public class ViewController {
     @FXML
     private void applyButtonPressed() {
         readProperties();
+        Window window = startButton.getScene().getWindow();
+        window.setWidth(CELL_SIZE * currentWidth + 18);
+        window.setHeight(CELL_SIZE * currentHeight + controlPane.getHeight() + 46);
+        window.centerOnScreen();
     }
 
     public void updateScoreLabel() {
@@ -241,7 +238,6 @@ public class ViewController {
         for (Pair<Integer, Integer> coords : snake.getSnakeArray()) {
             gc.setFill(Color.YELLOW);
             gc.fillOval(coords.getKey() * CELL_SIZE, coords.getValue() * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-            System.out.println(coords.getKey() + " " + coords.getValue());
         }
     }
 
@@ -263,28 +259,37 @@ public class ViewController {
     public void mouseClicked(String button) {
         if (button.equals("PRIMARY")) {
             snake.turnLeft();
-            System.out.println("left");
         }
         if (button.equals("SECONDARY")) {
             snake.turnRight();
-            System.out.println("right");
         }
     }
 
     public void keyPressed(KeyCode button) {
-        System.out.println(button);
         if (button == KeyCode.LEFT) {
             snake.turnLeft();
-            System.out.println("left");
         }
         if (button == KeyCode.RIGHT) {
             snake.turnRight();
-            System.out.println("right");
         }
     }
 
     @FXML
-    public void gameOverButtonPressed(){
-        initializeStartScreen();
+    public void pauseButtonPressed() {
+        if (pauseButton.getText().equals(PAUSE)) {
+            game.setPlaying(false);
+            pauseButton.setText(RESUME);
+        } else {
+            game.setPlaying(true);
+            pauseButton.setText(PAUSE);
+        }
+    }
+
+    public void showDialogGameOver() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Over!");
+        alert.setHeaderText(game.getGameOverMessage());
+        alert.setContentText("Your " + scoreLabel.getText());
+        alert.showAndWait();
     }
 }

@@ -39,6 +39,10 @@ public class GameController {
         return gameOverMessage;
     }
 
+    public void setGameOverMessage(String gameOverMessage) {
+        this.gameOverMessage = gameOverMessage;
+    }
+
     public Snake getSnake() {
         return snake;
     }
@@ -145,11 +149,10 @@ public class GameController {
         this.random = new Random();
 
         this.gameDelay /= difficulty;
+        placeFrogs();
     }
 
     public void addFrog(Type frogType) {
-        frogCount--;
-
         //Init field placement
         for (int i = 0; i < worldWidth; i++)
             for (int j = 0; j < worldHeight; j++) {
@@ -209,16 +212,11 @@ public class GameController {
         }
         if (isPlaying) {
             try {
-                if (blueFrog == null && random.nextInt(100) < 15) {
-                    addFrog(Type.BLUE);
+                if (frogCount <= 0) {
+                    gameOverMessage = "YOU WIN! All Frogs Are Eaten!";
+                    isGameOver = true;
+                    return;
                 }
-                if (redFrog == null && random.nextInt(100) < 35) {
-                    addFrog(Type.RED);
-                }
-                if (greenFrog == null) {
-                    addFrog(Type.GREEN);
-                }
-
                 snake.move();
                 Thread.sleep(gameDelay);
                 if (snake.isBitten()) {
@@ -226,32 +224,55 @@ public class GameController {
                     gameOverMessage = "You Bit Yourself";
                     return;
                 }
-
-                if (greenFrog != null && snake.getSnakeArray().get(0).equals(greenFrog.getCoordinates())) {
-                    score += scoreModifier;
-                    snake.eatNormal();
-                    greenFrog = null;
-
-                    if (snake.getLength() == worldHeight * worldWidth) {
-                        isGameOver = true;
-                        gameOverMessage = "YOU WIN!";
-                        return;
-                    } else {
-                        addFrog(Type.GREEN);
-                    }
-
+                if (random.nextInt(100) < 5){
+                    placeFrogs();
                 }
-                if (redFrog != null && snake.getSnakeArray().get(0).equals(redFrog.getCoordinates())) {
-                    score += scoreModifier * 2;
-                    snake.eatBonus();
-                    redFrog = null;
+                if (greenFrog != null) {
+                    if (snake.getSnakeArray().get(0).getKey() > greenFrog.getCoordinates().getKey() - 3
+                            && snake.getSnakeArray().get(0).getKey() < greenFrog.getCoordinates().getKey() + 3
+                            && snake.getSnakeArray().get(0).getValue() > greenFrog.getCoordinates().getValue() - 3
+                            && snake.getSnakeArray().get(0).getValue() < greenFrog.getCoordinates().getValue() + 3
+                            && random.nextInt(100) < 15) {
+                        greenFrog = null;
+                        addFrog(Type.GREEN);
+                    } else if (snake.getSnakeArray().get(0).equals(greenFrog.getCoordinates())) {
+                        score += scoreModifier;
+                        frogCount--;
+                        snake.eatNormal();
+                        placeFrogs();
+                        greenFrog = null;
 
-                    if (snake.getLength() < 3) {
-                        isGameOver = true;
-                        gameOverMessage = "Your Length Is Minimal";
-                        return;
-                    } else {
+                        if (snake.getLength() == worldHeight * worldWidth) {
+                            isGameOver = true;
+                            gameOverMessage = "YOU WIN!";
+                            return;
+                        } else {
+                            addFrog(Type.GREEN);
+                        }
+                    }
+                }
+                if (redFrog != null) {
+                    if (snake.getSnakeArray().get(0).getKey() > redFrog.getCoordinates().getKey() - 3
+                            && snake.getSnakeArray().get(0).getKey() < redFrog.getCoordinates().getKey() + 3
+                            && snake.getSnakeArray().get(0).getValue() > redFrog.getCoordinates().getValue() - 3
+                            && snake.getSnakeArray().get(0).getValue() < redFrog.getCoordinates().getValue() + 3
+                            && random.nextInt(100) < 25) {
+                        redFrog = null;
                         addFrog(Type.RED);
+                    } else if (snake.getSnakeArray().get(0).equals(redFrog.getCoordinates())) {
+                        score += scoreModifier * 2;
+                        frogCount--;
+                        snake.eatBonus();
+                        placeFrogs();
+                        redFrog = null;
+
+                        if (snake.getLength() < 3) {
+                            isGameOver = true;
+                            gameOverMessage = "Your Length Is Minimal";
+                            return;
+                        } else {
+                            addFrog(Type.RED);
+                        }
                     }
                 }
                 if (blueFrog != null && snake.getSnakeArray().get(0).equals(blueFrog.getCoordinates())) {
@@ -262,6 +283,18 @@ public class GameController {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void placeFrogs() {
+        if (blueFrog == null && random.nextInt(100) < 15) {
+            addFrog(Type.BLUE);
+        }
+        if (redFrog == null && random.nextInt(100) < 35) {
+            addFrog(Type.RED);
+        }
+        if (greenFrog == null) {
+            addFrog(Type.GREEN);
         }
     }
 }

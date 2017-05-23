@@ -290,6 +290,6 @@ public class ViewController {
         alert.setTitle("Game Over!");
         alert.setHeaderText(game.getGameOverMessage());
         alert.setContentText("Your " + scoreLabel.getText());
-        alert.showAndWait();
+        alert.show();
     }
 }
